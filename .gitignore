@@ -1,0 +1,40 @@
+# =========================
+# Ignorer environnements Python
+env/
+venv/
+ENV/
+.venv/
+
+# Fichiers Python compilés
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Fichiers de logs
+*.log
+
+# Base de données locale
+db.sqlite3
+
+# Configurations spécifiques à l'IDE
+.vscode/
+.idea/
+
+# Dossiers lourds ou temporaires
+media/
+staticfiles/
+tmp/
+*.zip
+*.rar
+*.tar
+*.gz
+*.7z
+*.mp4
+*.avi
+*.mov
+
+# Torch, modèles ML volumineux
+*.pt
+*.pth
+*.onnx
