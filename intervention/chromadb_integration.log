@@ -1,0 +1,12 @@
+INFO 2025-07-17 13:56:02,048 chromadb_manager 10696 2780 Created new ChromaDB collection
+INFO 2025-07-17 14:03:58,424 chromadb_manager 10696 2780 ChromaDB Manager initialized successfully
+INFO 2025-07-17 14:05:22,406 chromadb_manager 7856 14108 Connected to existing ChromaDB collection
+INFO 2025-07-17 14:05:32,513 chromadb_manager 7856 14108 ChromaDB Manager initialized successfully
+INFO 2025-07-17 14:07:04,874 chromadb_manager 25364 10084 Connected to existing ChromaDB collection
+INFO 2025-07-17 14:07:17,681 chromadb_manager 25364 10084 ChromaDB Manager initialized successfully
+INFO 2025-07-17 14:07:32,570 chromadb_manager 7064 16988 Connected to existing ChromaDB collection
+INFO 2025-07-17 14:07:50,500 chromadb_manager 7064 16988 ChromaDB Manager initialized successfully
+INFO 2025-07-17 14:45:38,412 chromadb_manager 12276 10632 Connected to existing ChromaDB collection
+INFO 2025-07-17 14:45:44,558 chromadb_manager 12276 10632 ChromaDB Manager initialized successfully
+INFO 2025-07-17 14:45:58,016 chromadb_manager 21588 11040 Connected to existing ChromaDB collection
+INFO 2025-07-17 14:46:04,283 chromadb_manager 21588 11040 ChromaDB Manager initialized successfully
