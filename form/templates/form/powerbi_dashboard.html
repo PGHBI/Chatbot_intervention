@@ -1,0 +1,324 @@
+{% extends 'form/base.html' %}
+
+{% block title %}Power BI Dashboard - Gestion des Interventions{% endblock %}
+
+{% block content %}
+<div class="space-y-8">
+    <!-- En-tête Power BI -->
+    <div class="bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl shadow-sm p-8 text-white">
+        <div class="flex items-center justify-between">
+            <div>
+                <div class="flex items-center space-x-3 mb-4">
+                    <svg class="w-10 h-10" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M2 13h6v8H2v-8zM9 3h6v18H9V3zm7 5h6v13h-6V8z"/>
+                    </svg>
+                    <h1 class="text-3xl font-bold">Power BI Analytics</h1>
+                </div>
+                <p class="text-blue-100 text-lg">
+                    Tableau de bord analytique pour le suivi des interventions
+                </p>
+            </div>
+            <div class="text-right">
+                <div class="text-sm text-blue-200">Dernière mise à jour</div>
+                <div class="text-lg font-semibold" id="last-update">
+                    {{ "now"|date:"d/m/Y H:i" }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Configuration Power BI -->
+    <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200">
+        <div class="flex items-center justify-between mb-6">
+            <h2 class="text-lg font-semibold text-slate-900">Configuration Power BI</h2>
+            <button id="refresh-iframe" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                </svg>
+                <span>Actualiser</span>
+            </button>
+        </div>
+
+        <!-- URL Configuration Form -->
+        <div class="mb-6">
+            <label for="powerbi-url" class="block text-sm font-medium text-slate-700 mb-2">
+                URL de votre rapport Power BI (URL publique ou embed)
+            </label>
+            <div class="flex space-x-2">
+                <input 
+                    type="url" 
+                    id="powerbi-url" 
+                    placeholder="https://app.powerbi.com/view?r=..." 
+                    class="flex-1 px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    value="{{ powerbi_url|default:'' }}"
+                />
+                <button id="load-report" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+                    Charger
+                </button>
+                <button id="save-url" class="px-4 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-700 transition-colors">
+                    Sauvegarder
+                </button>
+            </div>
+            <p class="text-sm text-slate-500 mt-2">
+                Collez l'URL de partage public de votre rapport Power BI ou l'URL d'intégration
+            </p>
+        </div>
+
+        <!-- Instructions -->
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <h3 class="font-medium text-blue-800 mb-2">Comment obtenir l'URL de votre rapport :</h3>
+            <ol class="list-decimal list-inside text-sm text-blue-700 space-y-1">
+                <li>Ouvrez votre rapport dans Power BI Service</li>
+                <li>Cliquez sur "Fichier" → "Intégrer" → "Site web public"</li>
+                <li>Copiez l'URL générée et collez-la ci-dessus</li>
+                <li>Ou utilisez l'URL de partage direct de votre rapport</li>
+            </ol>
+        </div>
+    </div>
+
+    <!-- Power BI Report Container -->
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+        <div class="p-4 border-b border-slate-200 bg-slate-50">
+            <div class="flex items-center justify-between">
+                <h2 class="text-lg font-semibold text-slate-900">Rapport Power BI</h2>
+                <div class="flex space-x-2">
+                    <button id="fullscreen-btn" class="px-4 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-700 transition-colors flex items-center space-x-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path>
+                        </svg>
+                        <span>Plein écran</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Power BI Iframe Container -->
+        <div id="powerbi-container" style="height: 800px; width: 100%; position: relative;">
+            <div id="loading-message" class="flex items-center justify-center h-full bg-slate-50">
+                <div class="text-center">
+                    <svg class="w-12 h-12 text-slate-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                    </svg>
+                    <p class="text-slate-600 mb-2">Aucun rapport Power BI chargé</p>
+                    <p class="text-sm text-slate-500">Configurez l'URL de votre rapport ci-dessus</p>
+                </div>
+            </div>
+            
+            <iframe 
+                id="powerbi-iframe" 
+                style="width: 100%; height: 100%; border: none; display: none;"
+                allowfullscreen="true"
+                webkitallowfullscreen="true"
+                mozallowfullscreen="true">
+            </iframe>
+        </div>
+    </div>
+
+    <!-- Actions et Informations -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <!-- Actions rapides -->
+        <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200">
+            <h3 class="text-lg font-semibold text-slate-900 mb-4">Actions Rapides</h3>
+            <div class="space-y-3">
+                <button onclick="refreshData()" class="w-full text-left px-4 py-3 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors flex items-center space-x-3">
+                    <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                    </svg>
+                    <span>Actualiser les données</span>
+                </button>
+                
+                <a href="{% url 'nouvelle_intervention' %}" class="w-full text-left px-4 py-3 bg-green-50 hover:bg-green-100 rounded-lg transition-colors flex items-center space-x-3">
+                    <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                    </svg>
+                    <span>Nouvelle intervention</span>
+                </a>
+                
+                <a href="{% url 'dashboard' %}" class="w-full text-left px-4 py-3 bg-purple-50 hover:bg-purple-100 rounded-lg transition-colors flex items-center space-x-3">
+                    <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                    </svg>
+                    <span>Tableau de bord principal</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Informations système -->
+        <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200">
+            <h3 class="text-lg font-semibold text-slate-900 mb-4">Informations Power BI</h3>
+            <div class="space-y-3 text-sm">
+                <div class="flex justify-between">
+                    <span class="text-slate-600">Status:</span>
+                    <span id="powerbi-status" class="text-slate-900">Non configuré</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-slate-600">Type d'intégration:</span>
+                    <span class="text-slate-900">Iframe</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-slate-600">Dernière actualisation:</span>
+                    <span id="last-refresh" class="text-slate-900">{{ "now"|date:"H:i" }}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-slate-600">URL configurée:</span>
+                    <span id="current-url" class="text-slate-900 text-xs">Aucune</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const powerbiUrl = document.getElementById('powerbi-url');
+    const powerbiIframe = document.getElementById('powerbi-iframe');
+    const loadingMessage = document.getElementById('loading-message');
+    const loadReportBtn = document.getElementById('load-report');
+    const saveUrlBtn = document.getElementById('save-url');
+    const refreshIframeBtn = document.getElementById('refresh-iframe');
+    const fullscreenBtn = document.getElementById('fullscreen-btn');
+    const powerbiStatus = document.getElementById('powerbi-status');
+    const currentUrl = document.getElementById('current-url');
+    const lastRefresh = document.getElementById('last-refresh');
+
+    // Load saved URL from localStorage
+    const savedUrl = localStorage.getItem('powerbi-url');
+    if (savedUrl) {
+        powerbiUrl.value = savedUrl;
+        loadReport(savedUrl);
+    }
+
+    // Load report function
+    function loadReport(url) {
+        if (!url) {
+            url = powerbiUrl.value.trim();
+        }
+        
+        if (!url) {
+            alert('Veuillez entrer une URL Power BI valide');
+            return;
+        }
+
+        // Show loading
+        loadingMessage.style.display = 'flex';
+        powerbiIframe.style.display = 'none';
+        
+        // Update iframe src
+        powerbiIframe.src = url;
+        
+        // Handle iframe load
+        powerbiIframe.onload = function() {
+            loadingMessage.style.display = 'none';
+            powerbiIframe.style.display = 'block';
+            powerbiStatus.textContent = 'Connecté';
+            powerbiStatus.className = 'text-green-600 font-medium';
+            currentUrl.textContent = url.substring(0, 50) + '...';
+            updateLastRefresh();
+        };
+        
+        // Handle iframe error
+        powerbiIframe.onerror = function() {
+            loadingMessage.innerHTML = `
+                <div class="text-center">
+                    <svg class="w-12 h-12 text-red-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <p class="text-red-600 mb-2">Erreur de chargement</p>
+                    <p class="text-sm text-slate-500">Vérifiez l'URL ou les permissions du rapport</p>
+                    <button onclick="location.reload()" class="mt-2 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">
+                        Réessayer
+                    </button>
+                </div>
+            `;
+            powerbiStatus.textContent = 'Erreur';
+            powerbiStatus.className = 'text-red-600 font-medium';
+        };
+    }
+
+    // Event listeners
+    loadReportBtn.addEventListener('click', function() {
+        loadReport();
+    });
+
+    saveUrlBtn.addEventListener('click', function() {
+        const url = powerbiUrl.value.trim();
+        if (url) {
+            localStorage.setItem('powerbi-url', url);
+            showNotification('URL sauvegardée avec succès', 'success');
+        } else {
+            showNotification('Veuillez entrer une URL valide', 'error');
+        }
+    });
+
+    refreshIframeBtn.addEventListener('click', function() {
+        if (powerbiIframe.src) {
+            powerbiIframe.src = powerbiIframe.src;
+            updateLastRefresh();
+            showNotification('Rapport actualisé', 'success');
+        }
+    });
+
+    fullscreenBtn.addEventListener('click', function() {
+        if (powerbiIframe.requestFullscreen) {
+            powerbiIframe.requestFullscreen();
+        } else if (powerbiIframe.webkitRequestFullscreen) {
+            powerbiIframe.webkitRequestFullscreen();
+        } else if (powerbiIframe.mozRequestFullScreen) {
+            powerbiIframe.mozRequestFullScreen();
+        }
+    });
+
+    // Enter key support for URL input
+    powerbiUrl.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            loadReport();
+        }
+    });
+
+    // Global functions
+    window.refreshData = function() {
+        if (powerbiIframe.src) {
+            powerbiIframe.src = powerbiIframe.src;
+            updateLastRefresh();
+            showNotification('Données actualisées', 'success');
+        } else {
+            showNotification('Aucun rapport chargé', 'error');
+        }
+    };
+
+    function updateLastRefresh() {
+        const now = new Date();
+        lastRefresh.textContent = now.toLocaleTimeString('fr-FR');
+        document.getElementById('last-update').textContent = now.toLocaleString('fr-FR');
+    }
+
+    function showNotification(message, type) {
+        const notification = document.createElement('div');
+        notification.className = `fixed top-4 right-4 px-6 py-3 rounded-lg shadow-lg z-50 ${
+            type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
+        }`;
+        notification.textContent = message;
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            notification.remove();
+        }, 3000);
+    }
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+});
+</script>
+{% endblock %}

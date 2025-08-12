@@ -1,0 +1,108 @@
+{% extends 'form/base.html' %}
+
+{% block title %}Supprimer {{ intervention.reference }} - Gestion des Interventions{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto">
+    <div class="bg-white rounded-2xl shadow-xl p-8 border border-slate-200">
+        <!-- Icône d'avertissement -->
+        <div class="text-center mb-6">
+            <div class="inline-flex items-center justify-center w-16 h-16 bg-red-100 rounded-full mb-4">
+                <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                </svg>
+        
+            </div>
+            <h1 class="text-2xl font-bold text-slate-900 mb-2">Confirmer la suppression</h1>
+            <p class="text-slate-600">Cette action est irréversible</p>
+        </div>
+
+        <!-- Détails de l'intervention -->
+        <div class="bg-slate-50 rounded-xl p-6 mb-6">
+            <h2 class="text-lg font-semibold text-slate-900 mb-4">Intervention à supprimer :</h2>
+            
+            <div class="space-y-3">
+                <div>
+                    <span class="text-sm font-medium text-slate-600">Référence :</span>
+                    <p class="text-slate-900">{{ intervention.reference }}</p>
+                </div>
+                
+                <div>
+                    <span class="text-sm font-medium text-slate-600">Objet :</span>
+                    <p class="text-slate-900">{{ intervention.objet }}</p>
+                </div>
+                
+                <div>
+                    <span class="text-sm font-medium text-slate-600">Description :</span>
+                    <p class="text-slate-900">{{ intervention.description|truncatechars:150 }}</p>
+                </div>
+                
+                <div class="flex items-center gap-4">
+                    <div>
+                        <span class="text-sm font-medium text-slate-600">Criticité :</span>
+                        <span class="criticite-{{ intervention.criticite }} px-2 py-1 rounded-full text-xs font-medium border ml-2">
+                            {{ intervention.get_criticite_display }}
+                        </span>
+                    </div>
+                    
+                    <div>
+                        <span class="text-sm font-medium text-slate-600">Filiale :</span>
+                        <span class="text-slate-900 ml-2">{{ intervention.filiale }}</span>
+                    </div>
+                </div>
+                
+                <div>
+                    <span class="text-sm font-medium text-slate-600">Contact :</span>
+                    <span class="text-slate-900 ml-2">{{ intervention.contact }}</span>
+                </div>
+                
+                <div>
+                    <span class="text-sm font-medium text-slate-600">Date de création :</span>
+                    <span class="text-slate-900 ml-2">{{ intervention.date_creation|date:"d/m/Y H:i" }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Avertissement -->
+        <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                    </svg>
+                </div>
+                <div class="ml-3">
+                    <h3 class="text-sm font-medium text-red-800">Attention !</h3>
+                    <div class="mt-2 text-sm text-red-700">
+                        <ul class="list-disc list-inside space-y-1">
+                            <li>Cette intervention sera définitivement supprimée</li>
+                            <li>Tous les documents associés seront également supprimés</li>
+                            <li>Cette action ne peut pas être annulée</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Formulaire de confirmation -->
+        <form method="post" class="space-y-6">
+            {% csrf_token %}
+            
+            <!-- Boutons d'action -->
+            <div class="flex flex-col sm:flex-row gap-3 justify-end">
+                <a href="{% url 'detail_intervention' intervention.pk %}" 
+                   class="px-6 py-3 border border-slate-300 text-slate-700 rounded-xl hover:bg-slate-50 hover:border-slate-400 transition-all duration-200 font-medium text-center">
+                    Annuler
+                </a>
+                <button type="submit" 
+                        class="px-6 py-3 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-all duration-200 flex items-center justify-center space-x-2 font-medium shadow-lg hover:shadow-xl">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                    </svg>
+                    <span>Confirmer la suppression</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

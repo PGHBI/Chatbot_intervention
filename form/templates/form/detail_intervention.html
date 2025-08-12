@@ -1,0 +1,232 @@
+{% extends 'form/base.html' %}
+
+{% block title %}{{ intervention.reference }} - Détail Intervention{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto space-y-8">
+    <!-- En-tête avec actions -->
+    <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+                <div class="flex items-center gap-3 mb-2">
+                    <h1 class="text-2xl font-bold text-slate-900">{{ intervention.reference }}</h1>
+                    <span class="criticite-{{ intervention.criticite }} px-3 py-1 rounded-full text-sm font-medium border">
+                        {{ intervention.get_criticite_display }}
+                    </span>
+                </div>
+                <h2 class="text-lg font-semibold text-slate-700 mb-2">{{ intervention.objet }}</h2>
+                <div class="flex items-center gap-4 text-sm text-slate-600">
+                    <span>{{ intervention.filiale }}</span>
+                    <span>•</span>
+                    <span>{{ intervention.date_intervention|date:"d/m/Y H:i" }}</span>
+                </div>
+            </div>
+            <div class="flex gap-2">
+                <a href="{% url 'generate_intervention_pdf' intervention.pk %}" 
+                   class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center space-x-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    <span>PDF</span>
+                </a>
+                <a href="{% url 'modifier_intervention' intervention.pk %}" 
+                   class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                    Modifier
+                </a>
+                <a href="{% url 'supprimer_intervention' intervention.pk %}" 
+                   class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+                    Supprimer
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Informations principales -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <!-- Contact et Filiale -->
+        <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200">
+            <h2 class="text-lg font-semibold text-slate-900 mb-4 flex items-center">
+                <svg class="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                </svg>
+                Contact et Filiale
+            </h2>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="text-sm font-medium text-slate-600">Contact</label>
+                    <p class="text-slate-900 mt-1">{{ intervention.contact }}</p>
+                </div>
+                
+                <div>
+                    <label class="text-sm font-medium text-slate-600">Téléphone</label>
+                    <p class="text-slate-900 mt-1">
+                        <a href="tel:{{ intervention.numero_telephone }}" class="text-blue-600 hover:text-blue-700">
+                            {{ intervention.numero_telephone }}
+                        </a>
+                    </p>
+                </div>
+                
+                <div>
+                    <label class="text-sm font-medium text-slate-600">Filiale</label>
+                    <p class="text-slate-900 mt-1">{{ intervention.filiale }}</p>
+                </div>
+                
+                <div>
+                    <label class="text-sm font-medium text-slate-600">Diffusé par</label>
+                    <p class="text-slate-900 mt-1">{{ intervention.diffuseur }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Machine et Criticité -->
+        <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200">
+            <h2 class="text-lg font-semibold text-slate-900 mb-4 flex items-center">
+                <svg class="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                </svg>
+                Machine et Criticité
+            </h2>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="text-sm font-medium text-slate-600">Machine</label>
+                    <p class="text-slate-900 mt-1">{{ intervention.machine }}</p>
+                </div>
+                
+                <div>
+                    <label class="text-sm font-medium text-slate-600">Criticité</label>
+                    <div class="mt-1">
+                        <span class="criticite-{{ intervention.criticite }} px-3 py-1 rounded-full text-sm font-medium border">
+                            {{ intervention.get_criticite_display }}
+                        </span>
+                    </div>
+                </div>
+                
+                <div>
+                    <label class="text-sm font-medium text-slate-600">Date d'intervention</label>
+                    <p class="text-slate-900 mt-1">{{ intervention.date_intervention|date:"d/m/Y à H:i" }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Équipe d'intervention -->
+    <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200">
+        <h2 class="text-lg font-semibold text-slate-900 mb-4 flex items-center">
+            <svg class="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+            </svg>
+            Équipe d'Intervention
+        </h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <label class="text-sm font-medium text-slate-600">Intervenant(s)</label>
+                <div class="text-slate-900 mt-1 whitespace-pre-line">{{ intervention.intervenants }}</div>
+            </div>
+            
+            <div>
+                <label class="text-sm font-medium text-slate-600">Responsable(s)</label>
+                <div class="text-slate-900 mt-1 whitespace-pre-line">{{ intervention.responsables }}</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Description et Recommandations -->
+    <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200">
+        <h2 class="text-lg font-semibold text-slate-900 mb-4 flex items-center">
+            <svg class="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
+            Description et Recommandations
+        </h2>
+        
+        <div class="space-y-6">
+            <div>
+                <label class="text-sm font-medium text-slate-600">Description de l'intervention</label>
+                <div class="text-slate-900 mt-1 whitespace-pre-line">{{ intervention.description }}</div>
+            </div>
+            
+            {% if intervention.recommandations %}
+            <div>
+                <label class="text-sm font-medium text-slate-600">Recommandations des intervenants</label>
+                <div class="text-slate-900 mt-1 whitespace-pre-line bg-blue-40 p-4 rounded-lg border border-blue-200">{{ intervention.recommandations }}</div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200 mt-6">
+    <h2 class="text-lg font-semibold text-slate-900 mb-4">Ajouter un fichier</h2>
+
+    <form method="POST" action="{% url 'upload_document' intervention.pk %}" enctype="multipart/form-data" class="space-y-4">
+        {% csrf_token %}
+        {{ document_form.fichier }}
+        {{ document_form.nom_fichier }}
+
+        <button type="submit"
+                class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+            Upload
+        </button>
+    </form>
+</div>
+
+    <!-- Documents -->
+    {% if documents %}
+    <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200">
+        <h2 class="text-lg font-semibold text-slate-900 mb-4 flex items-center">
+            <svg class="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path>
+            </svg>
+            Documents joints
+        </h2>
+        
+        <div class="space-y-3">
+            {% for document in documents %}
+            <div class="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                <div class="flex items-center">
+                    <svg class="w-5 h-5 mr-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    <div>
+                        <p class="font-medium text-slate-900">{{ document.nom_fichier }}</p>
+                        <p class="text-sm text-slate-600">{{ document.date_upload|date:"d/m/Y H:i" }}</p>
+                    </div>
+                </div>
+                <a href="{{ document.fichier.url }}" target="_blank" 
+                   class="text-blue-600 hover:text-blue-700 font-medium">
+                    Télécharger
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Métadonnées -->
+    <div class="bg-slate-50 rounded-xl p-6 border border-slate-200">
+        <h2 class="text-lg font-semibold text-slate-900 mb-4">Informations système</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+            <div>
+                <span class="text-slate-600">Créé le :</span>
+                <span class="text-slate-900 ml-2">{{ intervention.date_creation|date:"d/m/Y H:i" }}</span>
+            </div>
+            <div>
+                <span class="text-slate-600">Modifié le :</span>
+                <span class="text-slate-900 ml-2">{{ intervention.date_modification|date:"d/m/Y H:i" }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bouton retour -->
+    <div class="flex justify-center">
+        <a href="{% url 'dashboard' %}" 
+           class="px-6 py-3 bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 transition-colors flex items-center space-x-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+            </svg>
+            <span>Retour au tableau de bord</span>  
+        </a>
+    </div>
+</div>
+{% endblock %}

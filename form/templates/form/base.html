@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Gestion des Interventions{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+
+            theme: {
+                extend: {
+                    colors: {
+                        'blue': {
+                            50: '#eff6ff',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .criticite-faible {
+    color: #15803d; /* text-green-700 */
+    background-color: #f0fdf4; /* bg-green-50 */
+    border-color: #bbf7d0; /* border-green-200 */
+}
+
+.criticite-moyenne {
+    color: #a16207; /* text-yellow-700 */
+    background-color: #fefce8; /* bg-yellow-50 */
+    border-color: #fde047; /* border-yellow-200 */
+}
+
+.criticite-haute {
+    color: #c2410c; /* text-orange-700 */
+    background-color: #fff7ed; /* bg-orange-50 */
+    border-color: #fed7aa; /* border-orange-200 */
+}
+
+.criticite-critique {
+    color: #b91c1c; /* text-red-700 */
+    background-color: #fef2f2; /* bg-red-50 */
+    border-color: #fecaca; /* border-red-200 */
+}
+        
+        /* Chatbot Styles */
+        .chatbot-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            box-shadow: 0 8px 32px rgba(102, 126, 234, 0.3);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .chatbot-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(102, 126, 234, 0.4);
+        }
+        
+        .chatbot-interface {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+        }
+        
+        .chat-message {
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .typing-indicator {
+            animation: pulse 1.5s infinite;
+        }
+        
+        .chat-input:focus {
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+
+        .context-source {
+            background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+            border-left: 4px solid #6366f1;
+        }
+
+        .loading-dots {
+            display: inline-block;
+        }
+
+        .loading-dots::after {
+            content: '';
+            animation: dots 1.5s steps(5, end) infinite;
+        }
+
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60% { content: '...'; }
+            80%, 100% { content: ''; }
+        }
+
+        /* Responsive chatbot sizing */
+        @media (max-width: 768px) {
+            .chatbot-interface {
+                width: calc(100vw - 2rem) !important;
+                height: calc(100vh - 8rem) !important;
+                right: 1rem !important;
+                bottom: 6rem !important;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm border-b border-slate-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-8">
+                    <div class="flex items-center space-x-2">
+                        <svg class="h-8 w-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        </svg>
+                        <h1 class="text-xl font-bold text-slate-900">Gestion des Interventions</h1>
+                    </div>
+                    
+                    <nav class="hidden md:flex space-x-8">
+                       
+                        <a href="{% url 'nouvelle_intervention' %}" 
+                           class="{% if request.resolver_match.url_name == 'nouvelle_intervention' %}text-blue-600 bg-blue-50{% else %}text-slate-600 hover:text-slate-900 hover:bg-slate-50{% endif %} px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                            Nouvelle intervention
+                        </a>
+                       
+                    
+                        <a href="https://app.powerbi.com/reportEmbed?reportId=8db283dd-c1c9-44d8-a5f2-aafbfba92b2d&autoAuth=true&embeddedDemo=true" 
+                           class="{% if request.resolver_match.url_name == 'powerbi_dashboard' %}text-blue-600 bg-blue-50{% else %}text-slate-600 hover:text-slate-900 hover:bg-slate-50{% endif %} px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                            Power BI Analytics
+
+
+                            
+                        </a>
+                    </nav>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <a href="https://app.powerbi.com/reportEmbed?reportId=8db283dd-c1c9-44d8-a5f2-aafbfba92b2d&autoAuth=true&embeddedDemo=true">
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5v-5z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                        </svg>
+                    </a>
+                    <button class="p-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-full transition-colors">
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Messages -->
+    {% if messages %}
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
+            {% for message in messages %}
+                <div class="{% if message.tags == 'success' %}bg-green-50 border-green-200 text-green-800{% elif message.tags == 'error' %}bg-red-50 border-red-200 text-red-800{% else %}bg-blue-50 border-blue-200 text-blue-800{% endif %} border rounded-lg p-4 mb-4">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            {% if message.tags == 'success' %}
+                                <svg class="h-5 w-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                                </svg>
+                            {% elif message.tags == 'error' %}
+                                <svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+                                </svg>
+                            {% endif %}
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm font-medium">{{ message }}</p>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- Contenu principal -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <!-- Chatbot Button -->
+    <div class="fixed bottom-6 right-6 z-50">
+        <button id="chatbot-toggle" class="chatbot-button w-16 h-16 rounded-full flex items-center justify-center text-white focus:outline-none focus:ring-4 focus:ring-purple-300">
+            <svg id="chat-icon" class="w-7 h-7 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+            </svg>
+            <svg id="close-icon" class="w-7 h-7 hidden transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+        </button>
+    </div>
+
+    <!-- Chatbot Interface - ENLARGED -->
+    <div id="chatbot-interface" class="fixed bottom-28 right-6 w-[480px] h-[700px] chatbot-interface rounded-2xl shadow-2xl z-40 transform translate-y-full opacity-0 transition-all duration-300 ease-out hidden">
+        <!-- Header -->
+        <div class="bg-gradient-to-r from-purple-600 to-blue-600 text-white p-6 rounded-t-2xl">
+            <div class="flex items-center space-x-4">
+                <div class="w-10 h-10 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                    </svg>
+                </div>
+                <div class="flex-1">
+                    <h3 class="font-semibold text-lg">Assistant IA Maintenance</h3>
+                    <p class="text-sm opacity-90">Interventions & Support Technique</p>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <div id="connection-status" class="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+                    <span class="text-xs opacity-75">En ligne</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chat Messages - ENLARGED -->
+        <div id="chat-messages" class="flex-1 p-6 space-y-4 overflow-y-auto scrollbar-hide" style="height: 480px;">
+            <!-- Welcome Message -->
+            <div class="chat-message flex items-start space-x-3">
+                <div class="w-10 h-10 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                    </svg>
+                </div>
+                <div class="bg-slate-100 rounded-2xl rounded-tl-md px-5 py-3 max-w-sm">
+                    <p class="text-sm text-slate-800 leading-relaxed">Bonjour ! Je suis votre assistant IA spécialisé en maintenance industrielle. Je peux vous aider avec vos interventions, l'historique des équipements, et des recommandations techniques. Comment puis-je vous aider ?</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Input Area - ENLARGED -->
+        <div class="p-6 border-t border-slate-200">
+            <div class="flex items-end space-x-3 mb-4">
+                <div class="flex-1 relative">
+                    <textarea 
+                        id="chat-input" 
+                        placeholder="Décrivez votre problème technique ou posez votre question..." 
+                        rows="2"
+                        class="chat-input w-full px-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:border-purple-500 transition-colors resize-none text-sm"
+                    ></textarea>
+                </div>
+                <button id="send-message" class="bg-gradient-to-r from-purple-600 to-blue-600 text-white p-3 rounded-xl hover:shadow-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-300 flex-shrink-0">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                    </svg>
+                </button>
+            </div>
+            
+            <!-- Quick Actions - ENLARGED -->
+            <div class="flex flex-wrap gap-2">
+                <button class="quick-action px-4 py-2 bg-slate-100 text-slate-700 rounded-full text-sm hover:bg-slate-200 transition-colors" data-message="Comment créer une nouvelle intervention ?">
+                    📝 Nouvelle intervention
+                </button>
+                <button class="quick-action px-4 py-2 bg-slate-100 text-slate-700 rounded-full text-sm hover:bg-slate-200 transition-colors" data-message="Quelles sont les interventions critiques ?">
+                    🚨 Interventions critiques
+                </button>
+                <button class="quick-action px-4 py-2 bg-slate-100 text-slate-700 rounded-full text-sm hover:bg-slate-200 transition-colors" data-message="Problème de moteur électrique">
+                    ⚡ Problème moteur
+                </button>
+                <button class="quick-action px-4 py-2 bg-slate-100 text-slate-700 rounded-full text-sm hover:bg-slate-200 transition-colors" data-message="Historique machine M001">
+                    📊 Historique équipement
+                </button>
+                <button class="quick-action px-4 py-2 bg-slate-100 text-slate-700 rounded-full text-sm hover:bg-slate-200 transition-colors" data-message="Comment générer un rapport PDF ?">
+                    📄 Rapport PDF
+                </button>
+                <button class="quick-action px-4 py-2 bg-slate-100 text-slate-700 rounded-full text-sm hover:bg-slate-200 transition-colors" data-message="Maintenance préventive compresseur">
+                    🔧 Maintenance préventive
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        // Fonction pour fermer les messages automatiquement
+        setTimeout(function() {
+            const messages = document.querySelectorAll('[class*="bg-green-50"], [class*="bg-red-50"], [class*="bg-blue-50"]');
+            messages.forEach(function(message) {
+                if (message.parentElement) {
+                    message.style.transition = 'opacity 0.5s';
+                    message.style.opacity = '0';
+                    setTimeout(function() {
+                        message.remove();
+                    }, 500);
+                }
+            });
+        }, 5000);
+
+        // Chatbot functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const chatbotToggle = document.getElementById('chatbot-toggle');
+            const chatbotInterface = document.getElementById('chatbot-interface');
+            const chatIcon = document.getElementById('chat-icon');
+            const closeIcon = document.getElementById('close-icon');
+            const chatInput = document.getElementById('chat-input');
+            const sendButton = document.getElementById('send-message');
+            const chatMessages = document.getElementById('chat-messages');
+            const quickActions = document.querySelectorAll('.quick-action');
+            const connectionStatus = document.getElementById('connection-status');
+
+            let isOpen = false;
+            let userId = 'user_' + Math.random().toString(36).substr(2, 9);
+
+            // Toggle chatbot
+            chatbotToggle.addEventListener('click', function() {
+                if (isOpen) {
+                    closeChatbot();
+                } else {
+                    openChatbot();
+                }
+            });
+
+            function openChatbot() {
+                isOpen = true;
+                chatbotInterface.classList.remove('hidden');
+                setTimeout(() => {
+                    chatbotInterface.classList.remove('translate-y-full', 'opacity-0');
+                    chatbotInterface.classList.add('translate-y-0', 'opacity-100');
+                }, 10);
+                
+                chatIcon.classList.add('hidden');
+                closeIcon.classList.remove('hidden');
+                chatInput.focus();
+            }
+
+            function closeChatbot() {
+                isOpen = false;
+                chatbotInterface.classList.remove('translate-y-0', 'opacity-100');
+                chatbotInterface.classList.add('translate-y-full', 'opacity-0');
+                
+                setTimeout(() => {
+                    chatbotInterface.classList.add('hidden');
+                }, 300);
+                
+                closeIcon.classList.add('hidden');
+                chatIcon.classList.remove('hidden');
+            }
+
+            // Auto-resize textarea
+            chatInput.addEventListener('input', function() {
+                this.style.height = 'auto';
+                this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+            });
+
+            // Send message
+            function sendMessage() {
+                const message = chatInput.value.trim();
+                if (message) {
+                    addUserMessage(message);
+                    chatInput.value = '';
+                    chatInput.style.height = 'auto';
+                    
+                    // Show typing indicator
+                    addTypingIndicator();
+                    
+                    // Send to RAG API
+                    fetch('/api/chatbot/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': getCookie('csrftoken')
+                        },
+                        body: JSON.stringify({
+                            message: message,
+                            user_id: userId
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        removeTypingIndicator();
+                        if (data.success) {
+                            addBotMessage(data.response, data.context);
+                            // Handle UI actions if any
+                            if (data.actions && data.actions.length > 0) {
+                                handleUIActions(data.actions);
+                            }
+                            updateConnectionStatus(true);
+                        } else {
+                            addBotMessage('Désolé, une erreur s\'est produite. Veuillez réessayer.');
+                            updateConnectionStatus(false);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        removeTypingIndicator();
+                        addBotMessage('Désolé, je ne peux pas répondre pour le moment. Veuillez réessayer plus tard.');
+                        updateConnectionStatus(false);
+                    });
+                }
+            }
+
+            sendButton.addEventListener('click', sendMessage);
+            chatInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage();
+                }
+            });
+
+            // Quick actions
+            quickActions.forEach(button => {
+                button.addEventListener('click', function() {
+                    const message = this.getAttribute('data-message');
+                    chatInput.value = message;
+                    sendMessage();
+                });
+            });
+
+            function addUserMessage(message) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'chat-message flex items-start space-x-3 justify-end';
+                messageDiv.innerHTML = `
+                    <div class="bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-2xl rounded-tr-md px-5 py-3 max-w-sm">
+                        <p class="text-sm leading-relaxed">${escapeHtml(message)}</p>
+                    </div>
+                    <div class="w-10 h-10 bg-slate-300 rounded-full flex items-center justify-center flex-shrink-0">
+                        <svg class="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                        </svg>
+                    </div>
+                `;
+                chatMessages.appendChild(messageDiv);
+                scrollToBottom();
+            }
+
+            function addBotMessage(message, context = null) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'chat-message flex items-start space-x-3';
+                
+                let contextHtml = '';
+                if (context && context.length > 0) {
+                    contextHtml = `
+                        <div class="mt-3 text-xs">
+                            <details class="context-source rounded-lg p-3 mt-2">
+                                <summary class="cursor-pointer font-medium text-slate-600 hover:text-slate-800">Sources (${context.length})</summary>
+                                <div class="mt-2 space-y-2">
+                                    ${context.map(c => `
+                                        <div class="text-slate-500 p-2 bg-white rounded border-l-2 border-indigo-200">
+                                            <span class="font-medium">${c.source || 'Document'}</span>
+                                            ${c.page ? ` - Page ${c.page}` : ''}
+                                            ${c.similarity ? ` (${(1-c.similarity).toFixed(2)} relevance)` : ''}
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </details>
+                        </div>
+                    `;
+                }
+                
+                messageDiv.innerHTML = `
+                    <div class="w-10 h-10 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
+                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                        </svg>
+                    </div>
+                    <div class="bg-slate-100 rounded-2xl rounded-tl-md px-5 py-3 max-w-sm">
+                        <p class="text-sm text-slate-800 leading-relaxed">${escapeHtml(message).replace(/\n/g, '<br>')}</p>
+                        ${contextHtml}
+                    </div>
+                `;
+                chatMessages.appendChild(messageDiv);
+                scrollToBottom();
+            }
+
+            function addTypingIndicator() {
+                const typingDiv = document.createElement('div');
+                typingDiv.id = 'typing-indicator';
+                typingDiv.className = 'chat-message flex items-start space-x-3';
+                typingDiv.innerHTML = `
+                    <div class="w-10 h-10 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
+                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                        </svg>
+                    </div>
+                    <div class="bg-slate-100 rounded-2xl rounded-tl-md px-5 py-3">
+                        <p class="text-sm text-slate-800">
+                            <span class="loading-dots">Analyse en cours</span>
+                        </p>
+                    </div>
+                `;
+                chatMessages.appendChild(typingDiv);
+                scrollToBottom();
+            }
+
+            function removeTypingIndicator() {
+                const typingIndicator = document.getElementById('typing-indicator');
+                if (typingIndicator) {
+                    typingIndicator.remove();
+                }
+            }
+
+            function updateConnectionStatus(isConnected) {
+                if (isConnected) {
+                    connectionStatus.className = 'w-3 h-3 bg-green-400 rounded-full animate-pulse';
+                } else {
+                    connectionStatus.className = 'w-3 h-3 bg-red-400 rounded-full';
+                }
+            }
+
+            function handleUIActions(actions) {
+                actions.forEach(action => {
+                    switch(action.type) {
+                        case 'redirect':
+                            setTimeout(() => {
+                                window.location.href = action.url;
+                            }, 1000);
+                            break;
+                        case 'filter':
+                            const filterElement = document.querySelector(`select[name="${action.field}"]`);
+                            if (filterElement) {
+                                filterElement.value = action.value;
+                                filterElement.form.submit();
+                            }
+                            break;
+                        case 'highlight':
+                            const element = document.querySelector(action.selector);
+                            if (element) {
+                                element.style.animation = 'pulse 2s infinite';
+                                setTimeout(() => {
+                                    element.style.animation = '';
+                                }, 4000);
+                            }
+                            break;
+                    }
+                });
+            }
+
+            function scrollToBottom() {
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+
+            function escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+
+            function getCookie(name) {
+                let cookieValue = null;
+                if (document.cookie && document.cookie !== '') {
+                    const cookies = document.cookie.split(';');
+                    for (let i = 0; i < cookies.length; i++) {
+                        const cookie = cookies[i].trim();
+                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            }
+        });
+    </script>
+    
+    {% block extra_js %}
+    {% endblock %}
+</body>
+</html>

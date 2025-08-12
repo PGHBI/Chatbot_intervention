@@ -1,0 +1,564 @@
+{% extends 'form/base.html' %}
+
+{% block title %}Tableau de bord - Gestion des Interventions{% endblock %}
+
+{% block content %}
+<div class="space-y-8">
+    <!-- Statistiques -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-7 gap-6">
+        <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-slate-600">Total</p>
+                    <p class="text-3xl font-bold text-slate-900">{{ stats.total }}</p>
+                </div>
+                <div class="bg-blue-50 p-3 rounded-full">
+                    <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-slate-600">Faible</p>
+                    <p class="text-3xl font-bold text-green-600">{{ stats.faible }}</p>
+                </div>
+                <div class="bg-green-50 p-3 rounded-full">
+                    <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-slate-600">Moyenne</p>
+                    <p class="text-3xl font-bold text-yellow-600">{{ stats.moyenne }}</p>
+                </div>
+                <div class="bg-yellow-50 p-3 rounded-full">
+                    <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-slate-600">Haute</p>
+                    <p class="text-3xl font-bold text-orange-600">{{ stats.haute }}</p>
+                </div>
+                <div class="bg-orange-50 p-3 rounded-full">
+                    <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-slate-600">Critique</p>
+                    <p class="text-3xl font-bold text-red-600">{{ stats.critique }}</p>
+                </div>
+                <div class="bg-red-50 p-3 rounded-full">
+                    <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-slate-600">Machines</p>
+                    <p class="text-3xl font-bold text-purple-600">{{ stats.machines }}</p>
+                </div>
+                <div class="bg-purple-50 p-3 rounded-full">
+                    <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-slate-600">Filiales</p>
+                    <p class="text-3xl font-bold text-indigo-600">{{ stats.filiales }}</p>
+                </div>
+                <div class="bg-indigo-50 p-3 rounded-full">
+                    <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ChromaDB Status -->
+    {% if chromadb_stats %}
+    <div class="bg-gradient-to-r from-purple-50 to-blue-50 rounded-xl shadow-sm p-6 border border-purple-200">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="bg-purple-100 p-2 rounded-full">
+                    <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold text-slate-900">Base de Connaissances IA</h3>
+                    <p class="text-sm text-slate-600">
+                        {% if chromadb_stats.available %}
+                            {{ chromadb_stats.interventions }} interventions indexées sur {{ chromadb_stats.total }} documents
+                        {% else %}
+                            Non disponible - {{ chromadb_stats.error }}
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-2">
+                {% if chromadb_stats.available %}
+                    <div class="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+                    <span class="text-sm text-green-600 font-medium">Actif</span>
+                {% else %}
+                    <div class="w-3 h-3 bg-red-400 rounded-full"></div>
+                    <span class="text-sm text-red-600 font-medium">Inactif</span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Barre d'actions -->
+<div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200">
+    <div class="flex flex-col gap-6"> <!-- Changed to column layout -->
+        <!-- First Row: Search + Filters -->
+        <div class="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+            <div class="flex-1 flex flex-col sm:flex-row gap-4">
+                <form method="GET" class="flex-1 flex flex-col sm:flex-row gap-4">
+                    <div class="relative flex-1 max-w-md">
+                        <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                        <input
+                            type="text"
+                            name="search"
+                            value="{{ search_query }}"
+                            placeholder="Rechercher des interventions..."
+                            class="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        />
+                    </div>
+                    
+                    <div class="flex gap-2">
+                        <select name="criticite" class="px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <option value="all" {% if criticite_filter == 'all' %}selected{% endif %}>Toutes les criticités</option>
+                            {% for value, label in criticite_choices %}
+                                <option value="{{ value }}" {% if criticite_filter == value %}selected{% endif %}>{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                        
+                        <select name="filiale" class="px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <option value="all" {% if filiale_filter == 'all' %}selected{% endif %}>Toutes les filiales</option>
+                            {% for filiale in filiales %}
+                                <option value="{{ filiale }}" {% if filiale_filter == filiale %}selected{% endif %}>{{ filiale }}</option>
+                            {% endfor %}
+                        </select>
+                        
+                        <select name="machine" class="px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <option value="all" {% if machine_filter == 'all' %}selected{% endif %}>Toutes les machines</option>
+                            {% for machine in machines %}
+                                <option value="{{ machine }}" {% if machine_filter == machine %}selected{% endif %}>{{ machine }}</option>
+                            {% endfor %}
+                        </select>
+                        
+                        <button type="submit" class="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 transition-colors">
+                            Filtrer
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Second Row: Centered Buttons -->
+        <div class="flex justify-center gap-4"> <!-- Centered with gap -->
+            <!-- Bouton PDF -->
+            <a href="{% url 'generate_pdf_report' %}{% if search_query or criticite_filter != 'all' or filiale_filter != 'all' or machine_filter != 'all' %}?{% if search_query %}search={{ search_query }}{% endif %}{% if criticite_filter != 'all' %}{% if search_query %}&{% endif %}criticite={{ criticite_filter }}{% endif %}{% if filiale_filter != 'all' %}{% if search_query or criticite_filter != 'all' %}&{% endif %}filiale={{ filiale_filter }}{% endif %}{% if machine_filter != 'all' %}{% if search_query or criticite_filter != 'all' or filiale_filter != 'all' %}&{% endif %}machine={{ machine_filter }}{% endif %}{% endif %}" 
+               class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors flex items-center space-x-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+                <span>Rapport PDF</span>
+            </a>
+            
+            <a href="{% url 'nouvelle_intervention' %}" 
+               class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                </svg>
+                <span>Nouvelle intervention</span>
+            </a>
+            
+            <!-- PDF Upload Button -->
+            <button id="pdf-upload-btn" 
+                    class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center space-x-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                </svg>
+                <span>Créer depuis PDF</span>
+            </button>
+            <input type="file" id="pdf-file-input" accept=".pdf" style="display: none;">
+        </div>
+    </div>
+</div>
+    <!-- Liste des interventions -->
+    <div class="space-y-4">
+        {% if page_obj %}
+            {% for intervention in page_obj %}
+                <div class="bg-white rounded-xl shadow-sm p-8 border border-slate-200 hover:shadow-md transition-shadow">
+                    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                        <div class="flex-1">
+                            <div class="flex items-start justify-between mb-3">
+                                <div>
+                                    <div class="flex items-center gap-3 mb-2">
+                                        <h3 class="text-lg font-semibold text-slate-900">
+                                            {{ intervention.reference }}
+                                        </h3>
+                                        <span class="criticite-{{ intervention.criticite }} px-2 py-1 rounded-full text-xs font-medium border">
+                                            {{ intervention.get_criticite_display }}
+                                        </span>
+                                    </div>
+                                    <h4 class="text-md font-medium text-slate-800 mb-1">
+                                        {{ intervention.objet }}
+                                    </h4>
+                                    <p class="text-slate-600 text-sm">
+                                        {{ intervention.description|truncatechars:150 }}
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-sm text-slate-600">
+                                <div class="flex items-center gap-1">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                                    </svg>
+                                    <span>{{ intervention.contact }}</span>
+                                </div>
+                                <div class="flex items-center gap-1">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                                    </svg>
+                                    <span>{{ intervention.filiale }}</span>
+                                </div>
+                                <div class="flex items-center gap-1">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                                    </svg>
+                                    <span>{{ intervention.machine }}</span>
+                                </div>
+                                <div class="flex items-center gap-1">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                    </svg>
+                                    <span>{{ intervention.date_intervention|date:"d/m/Y H:i" }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center gap-2">
+                            <a href="{% url 'generate_intervention_pdf' intervention.pk %}" 
+                               class="px-4 py-2 text-red-600 hover:bg-red-51 rounded-lg transition-colors" 
+                               title="Télécharger PDF">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                </svg>
+                            </a>
+                            <a href="{% url 'detail_intervention' intervention.pk %}" 
+                               class="px-4 py-2 text-blue-600 hover:bg-blue-51 rounded-lg transition-colors">
+                                Voir détails
+                            </a>
+                            <a href="{% url 'modifier_intervention' intervention.pk %}" 
+                               class="px-4 py-2 bg-slate-100 text-slate-700 hover:bg-slate-200 rounded-lg transition-colors">
+                                Modifier
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+
+            <!-- Pagination -->
+            {% if page_obj.has_other_pages %}
+                <div class="flex justify-center mt-8">
+                    <nav class="flex items-center space-x-2">
+                        {% if page_obj.has_previous %}
+                            <a href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if criticite_filter != 'all' %}&criticite={{ criticite_filter }}{% endif %}{% if filiale_filter != 'all' %}&filiale={{ filiale_filter }}{% endif %}{% if machine_filter != 'all' %}&machine={{ machine_filter }}{% endif %}" 
+                               class="px-3 py-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors">
+                                Précédent
+                            </a>
+                        {% endif %}
+                        
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                                <span class="px-3 py-2 bg-blue-600 text-white rounded-lg">{{ num }}</span>
+                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                <a href="?page={{ num }}{% if search_query %}&search={{ search_query }}{% endif %}{% if criticite_filter != 'all' %}&criticite={{ criticite_filter }}{% endif %}{% if filiale_filter != 'all' %}&filiale={{ filiale_filter }}{% endif %}{% if machine_filter != 'all' %}&machine={{ machine_filter }}{% endif %}" 
+                                   class="px-3 py-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors">
+                                    {{ num }}
+                                </a>
+                            {% endif %}
+                        {% endfor %}
+                        
+                        {% if page_obj.has_next %}
+                            <a href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if criticite_filter != 'all' %}&criticite={{ criticite_filter }}{% endif %}{% if filiale_filter != 'all' %}&filiale={{ filiale_filter }}{% endif %}{% if machine_filter != 'all' %}&machine={{ machine_filter }}{% endif %}" 
+                               class="px-3 py-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors">
+                                Suivant
+                            </a>
+                        {% endif %}
+                    </nav>
+                </div>
+            {% endif %}
+        {% else %}
+            <div class="bg-white rounded-xl shadow-sm p-12 text-center border border-slate-200">
+                <div class="text-slate-400 mb-4">
+                    <svg class="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                </div>
+                <h3 class="text-lg font-medium text-slate-900 mb-2">Aucune intervention trouvée</h3>
+                <p class="text-slate-600 mb-4">Essayez d'ajuster vos filtres de recherche</p>
+                <a href="{% url 'nouvelle_intervention' %}" 
+                   class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                    Créer une nouvelle intervention
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- PDF Upload Modal -->
+<div id="pdf-upload-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center">
+    <div class="bg-white rounded-xl shadow-2xl p-6 max-w-md w-full mx-4">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-semibold text-slate-900">Créer intervention depuis PDF</h3>
+            <button id="close-pdf-modal" class="text-slate-400 hover:text-slate-600">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+        
+        <div id="pdf-upload-content">
+            <div class="border-2 border-dashed border-slate-300 rounded-lg p-6 text-center">
+                <svg class="mx-auto h-12 w-12 text-slate-400 mb-4" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                    <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+                <p class="text-sm text-slate-600 mb-4">
+                    Sélectionnez un fichier PDF contenant les informations d'intervention
+                </p>
+                <button id="select-pdf-btn" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                    Choisir un fichier PDF
+                </button>
+            </div>
+        </div>
+        
+        <div id="pdf-processing" class="hidden text-center py-8">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p class="text-slate-600">Extraction des informations en cours...</p>
+        </div>
+        
+        <div id="pdf-results" class="hidden">
+            <div class="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
+                <h4 class="font-medium text-green-800 mb-2">Informations extraites :</h4>
+                <div id="extracted-fields" class="text-sm text-green-700"></div>
+            </div>
+            <div class="flex space-x-3">
+                <button id="create-intervention-btn" class="flex-1 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors">
+                    Créer l'intervention
+                </button>
+                <button id="cancel-pdf-btn" class="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors">
+                    Annuler
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const pdfUploadBtn = document.getElementById('pdf-upload-btn');
+    const pdfFileInput = document.getElementById('pdf-file-input');
+    const pdfUploadModal = document.getElementById('pdf-upload-modal');
+    const closePdfModal = document.getElementById('close-pdf-modal');
+    const selectPdfBtn = document.getElementById('select-pdf-btn');
+    const pdfUploadContent = document.getElementById('pdf-upload-content');
+    const pdfProcessing = document.getElementById('pdf-processing');
+    const pdfResults = document.getElementById('pdf-results');
+    const createInterventionBtn = document.getElementById('create-intervention-btn');
+    const cancelPdfBtn = document.getElementById('cancel-pdf-btn');
+    const extractedFields = document.getElementById('extracted-fields');
+    
+    let extractedData = null;
+    let selectedFile = null;
+    
+    // Open modal
+    pdfUploadBtn.addEventListener('click', function() {
+        pdfUploadModal.classList.remove('hidden');
+        resetModal();
+    });
+    
+    // Close modal
+    closePdfModal.addEventListener('click', function() {
+        pdfUploadModal.classList.add('hidden');
+    });
+    
+    cancelPdfBtn.addEventListener('click', function() {
+        pdfUploadModal.classList.add('hidden');
+    });
+    
+    // Select PDF file
+    selectPdfBtn.addEventListener('click', function() {
+        pdfFileInput.click();
+    });
+    
+    // Handle file selection
+    pdfFileInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file && file.type === 'application/pdf') {
+            selectedFile = file;
+            extractPdfData(file);
+        } else {
+            alert('Veuillez sélectionner un fichier PDF valide.');
+        }
+    });
+    
+    // Create intervention
+    createInterventionBtn.addEventListener('click', function() {
+        if (selectedFile) {
+            createInterventionFromPdf(selectedFile);
+        }
+    });
+    
+    function resetModal() {
+        pdfUploadContent.classList.remove('hidden');
+        pdfProcessing.classList.add('hidden');
+        pdfResults.classList.add('hidden');
+        extractedData = null;
+        selectedFile = null;
+        pdfFileInput.value = '';
+    }
+    
+    function extractPdfData(file) {
+        pdfUploadContent.classList.add('hidden');
+        pdfProcessing.classList.remove('hidden');
+        
+        const formData = new FormData();
+        formData.append('pdf_file', file);
+        
+        fetch('/api/extract-pdf/', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            pdfProcessing.classList.add('hidden');
+            
+            if (data.success) {
+                extractedData = data.extracted_data;
+                displayExtractedData(data.extracted_data);
+                pdfResults.classList.remove('hidden');
+            } else {
+                alert('Erreur lors de l\'extraction: ' + data.error);
+                resetModal();
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            pdfProcessing.classList.add('hidden');
+            alert('Erreur lors de l\'extraction des données.');
+            resetModal();
+        });
+    }
+    
+    function displayExtractedData(data) {
+        let html = '<ul class="space-y-1">';
+        for (const [field, value] of Object.entries(data)) {
+            const fieldName = getFieldDisplayName(field);
+            html += `<li><strong>${fieldName}:</strong> ${value}</li>`;
+        }
+        html += '</ul>';
+        extractedFields.innerHTML = html;
+    }
+    
+    function createInterventionFromPdf(file) {
+        const formData = new FormData();
+        formData.append('pdf_file', file);
+        
+        fetch('/api/create-from-pdf/', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                pdfUploadModal.classList.add('hidden');
+                // Redirect to the new intervention
+                window.location.href = data.redirect_url;
+            } else {
+                alert('Erreur lors de la création: ' + data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Erreur lors de la création de l\'intervention.');
+        });
+    }
+    
+    function getFieldDisplayName(field) {
+        const fieldNames = {
+            'reference': 'Référence',
+            'machine': 'Machine',
+            'filiale': 'Filiale',
+            'contact': 'Contact',
+            'telephone': 'Téléphone',
+            'date_intervention': 'Date intervention',
+            'criticite': 'Criticité',
+            'objet': 'Objet',
+            'description': 'Description',
+            'intervenants': 'Intervenants',
+            'responsables': 'Responsables',
+            'recommandations': 'Recommandations'
+        };
+        return fieldNames[field] || field;
+    }
+    
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+});
+</script>
+{% endblock %}
